@@ -3,6 +3,7 @@ import BorrowersController from "./borrowers-controller.js";
 import { ReqValidationTypes } from "../shared/constants/enums.js";
 import { validateRequest } from "../shared/middlewares/request-validator.js";
 import { stringToDate } from "../shared/middlewares/str-date-converter.js";
+import { rateLimiter } from "../shared/middlewares/rate-limiter.js";
 import {
   listBorrowersSchema,
   registerBorrowerSchema,
@@ -18,6 +19,7 @@ const router = Router();
 
 router.get(
   "/",
+  rateLimiter,
   validateRequest(listBorrowersSchema, ReqValidationTypes.QUERY),
   BorrowersController.listBorrowers
 );
