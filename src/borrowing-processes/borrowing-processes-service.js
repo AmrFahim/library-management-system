@@ -207,28 +207,91 @@ class BorrowingProcessService {
       const overdueRecords = await BorrowingProcess.findAll({
         where: {
           returnDate: {
-            [Op.lt]: new Date(), // Return date is less than current date
+            // Return date is less than current date
+            [Op.lt]: new Date(),
           },
-          confirmedReturnDate: null, // Not yet confirmed as returned
+          // Not yet confirmed as returned
+          confirmedReturnDate: null,
         },
         include: [
           {
             model: Borrower,
-            attributes: ["id", "name", "email"], // Include relevant borrower details
+            attributes: ["id", "name", "email"],
           },
           {
             model: Book,
-            attributes: ["id", "title"], // Include relevant book details
+            attributes: ["id", "title"],
           },
         ],
-        order: [["returnDate", "ASC"]], // Sort by oldest overdue first
+        order: [["returnDate", "ASC"]],
       });
 
       return overdueRecords;
     } catch (error) {
-      console.error("Error retrieving overdue records:", error);
-      error.status = httpStatus.INTERNAL_SERVER_ERROR;
-      throw error;
+      const formattedError = new Error(
+        "Error while listing current overdue borrows:" + error.message
+      );
+      formattedError.status = httpStatus.INTERNAL_SERVER_ERROR;
+      throw formattedError;
+    }
+  }
+
+  static async listLastMonthBorrows(onlyOverdue = false) {
+    try {
+      const currentDate = new Date();
+      const startOfLastMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+        1
+      );
+
+      // Calculate the last day of the previous month
+      const endOfLastMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        0
+      );
+
+      const whereClause = {
+        createdAt: {
+          [Op.gte]: startOfLastMonth,
+          [Op.lte]: endOfLastMonth,
+        },
+      };
+
+      if (onlyOverdue) {
+        whereClause[Op.or] = [
+          { confirmedReturnDate: null },
+          sequelize.where(
+            sequelize.col("confirmedReturnDate"),
+            Op.gt,
+            sequelize.col("returnDate")
+          ),
+        ];
+      }
+
+      const processes = await BorrowingProcess.findAll({
+        where: whereClause,
+        include: [
+          {
+            model: Borrower,
+            attributes: ["name", "email"],
+          },
+          {
+            model: Book,
+            attributes: ["title", "author"],
+          },
+        ],
+        order: [["createdAt", "ASC"]],
+      });
+
+      return processes;
+    } catch (error) {
+      const formattedError = new Error(
+        "Error while listing last month borrows processes:" + error.message
+      );
+      formattedError.status = httpStatus.INTERNAL_SERVER_ERROR;
+      throw formattedError;
     }
   }
 }
