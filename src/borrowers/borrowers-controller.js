@@ -1,13 +1,31 @@
 import BorrowersService from "./borrowers-service.js";
+import BorrowingProcessService from "../borrowing-processes/borrowing-processes-service.js";
 import httpStatus from "http-status";
 
 class BorrowersController {
+  static async listBorrowers(req, res) {
+    try {
+      const { count, borrowers } = await BorrowersService.listBorrowers(
+        req.query
+      );
+      res.status(httpStatus.OK).json({
+        message: "Success",
+        count,
+        borrowers,
+      });
+    } catch (error) {
+      res.status(error.status).json({ error: error.message });
+    }
+  }
+
   static async register(req, res) {
     try {
-      const Borrower = await BorrowersService.register(req.body);
+      const borrower = await BorrowersService.register(req.body);
+      const { password, updatedAt, ...formattedBorrowerDate } =
+        borrower.toJSON();
       res.status(httpStatus.CREATED).json({
         message: "Borrower registered successfully",
-        Borrower,
+        borrower: formattedBorrowerDate,
       });
     } catch (error) {
       res
@@ -18,14 +36,16 @@ class BorrowersController {
 
   static async update(req, res) {
     try {
-      const BorrowerId = req.params.id;
+      const borrowerId = req.params.id;
       const updatedBorrower = await BorrowersService.update(
-        BorrowerId,
+        borrowerId,
         req.body
       );
+      const { password, updatedAt, ...formattedBorrowerDate } =
+        updatedBorrower.toJSON();
       res.status(httpStatus.OK).json({
         message: "Borrower updated successfully",
-        Borrower: updatedBorrower,
+        Borrower: formattedBorrowerDate,
       });
     } catch (error) {
       res
@@ -47,10 +67,66 @@ class BorrowersController {
         .json({ error: error.message });
     }
   }
-  static async listBorrowers(req, res) {
+
+  static async borrow(req, res) {
     try {
-      const books = await BorrowersService.listBorrowers(req.query);
-      res.status(httpStatus.OK).json(books);
+      const borrowerId = req.params.id;
+      const bookId = req.params.bookId;
+
+      const borrowProcess = await BorrowingProcessService.borrow(
+        borrowerId,
+        bookId,
+        req.body.returnDate
+      );
+      const { returnDate } = borrowProcess.toJSON();
+      res.status(httpStatus.CREATED).json({
+        message: "the borrowing process is done successfully",
+        borrowerId,
+        bookId,
+        returnDate,
+      });
+    } catch (error) {
+      res
+        .status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
+
+  static async return(req, res) {
+    try {
+      const borrowerId = req.params.id;
+      const bookId = req.params.bookId;
+
+      const returnProcess = await BorrowingProcessService.returnBook(
+        borrowerId,
+        bookId
+      );
+      const { confirmedReturnDate } = returnProcess.toJSON();
+      res.status(httpStatus.OK).json({
+        message: "returning the book is done successfully",
+        borrowerId,
+        bookId,
+        confirmedReturnDate,
+      });
+    } catch (error) {
+      res
+        .status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
+
+  static async listBorrowerActiveProcesses(req, res) {
+    try {
+      const borrowerId = req.params.id;
+      const processes = await BorrowingProcessService.listActiveBorrowedBooks(
+        borrowerId
+      );
+
+      res.status(httpStatus.OK).json({
+        message: "success",
+        count: processes.length,
+        books: processes,
+      });
     } catch (error) {
       res.status(error.status).json({ error: error.message });
     }

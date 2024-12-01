@@ -78,11 +78,14 @@ class BorrowersService {
     sortOrder = "ASC",
   }) {
     try {
-      return await Borrower.findAll({
+      const { count, rows: borrowers } = await Borrower.findAndCountAll({
         limit: parseInt(limit),
         offset: parseInt(offset),
         order: [[sortBy, sortOrder]],
+        attributes: ["id", "name", "email", "registerAt"],
+        raw: true,
       });
+      return { count, borrowers };
     } catch (error) {
       const formattedError = new Error(
         `Error while fetching borrowers: ${error.message}`

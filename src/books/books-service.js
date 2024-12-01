@@ -42,8 +42,12 @@ class BooksService {
         };
       }
 
-      const books = await Book.findAll(queryOptions);
-      return books;
+      const { count, rows: books } = await Book.findAndCountAll({
+        ...queryOptions,
+        attributes: ["title", "author", "isbn"],
+        raw: true,
+      });
+      return { count, books };
     } catch (error) {
       const formattedError = new Error(
         "Error while fetching books: " + error.message

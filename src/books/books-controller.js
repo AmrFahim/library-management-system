@@ -4,8 +4,12 @@ import BooksService from "./books-service.js";
 class BooksController {
   static async listBooks(req, res) {
     try {
-      const books = await BooksService.listBooks(req.query);
-      res.status(httpStatus.OK).json(books);
+      const { count, books } = await BooksService.listBooks(req.query);
+      res.status(httpStatus.OK).json({
+        message: "success",
+        count,
+        books,
+      });
     } catch (error) {
       res.status(error.status).json({ error: error.message });
     }
@@ -13,7 +17,13 @@ class BooksController {
   static async addBook(req, res) {
     try {
       const book = await BooksService.addBook(req.body);
-      res.status(httpStatus.CREATED).json({ book });
+      const { createdAt, updatedAt, ...bookWithoutMetadata } = book.toJSON();
+      res
+        .status(httpStatus.CREATED)
+        .json({
+          message: "Book is added successfully",
+          book: bookWithoutMetadata,
+        });
     } catch (error) {
       res
         .status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
@@ -24,10 +34,14 @@ class BooksController {
     try {
       const bookId = req.params.id;
       const updatedBook = await BooksService.updateBook(bookId, req.body);
-      res.status(httpStatus.OK).json({
-        message: "Book updated successfully",
-        book: updatedBook,
-      });
+      const { createdAt, updatedAt, ...bookWithoutMetadata } =
+        updatedBook.toJSON();
+      res
+        .status(httpStatus.OK)
+        .json({
+          message: "Book is updated successfully",
+          book: bookWithoutMetadata,
+        });
     } catch (error) {
       res
         .status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
@@ -38,7 +52,9 @@ class BooksController {
     try {
       const bookId = req.params.id;
       await BooksService.deleteBook(bookId);
-      res.status(httpStatus.OK).json({ message: "Book deleted successfully" });
+      res
+        .status(httpStatus.OK)
+        .json({ message: "Book is deleted successfully" });
     } catch (error) {
       res
         .status(error.status || httpStatus.NOT_FOUND)

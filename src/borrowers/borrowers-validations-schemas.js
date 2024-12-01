@@ -3,6 +3,7 @@ import {
   NAME_REGEX,
   EMAIL_REGEX,
   PASSWORD_REGEX,
+  DATE_REGEX,
 } from "../shared/constants/regex.js";
 
 export const registerBorrowerSchema = Joi.object({
@@ -31,4 +32,22 @@ export const listBorrowersSchema = Joi.object({
   sortBy: Joi.string().valid("title", "author", "isbn").default("title"),
   sortOrder: Joi.string().valid("ASC", "DESC").default("ASC"),
   searchTerm: Joi.string().allow(null, "").default(null),
+});
+
+export const borrowParamsSchema = Joi.object({
+  id: Joi.number().min(1).required(),
+  bookId: Joi.number().min(1).required(),
+});
+
+export const borrowBodySchema = Joi.object({
+  returnDate: Joi.string().pattern(DATE_REGEX).required(),
+});
+
+export const returnBookParamsSchema = Joi.object({
+  id: Joi.number().min(1).required(),
+  bookId: Joi.number().min(1).required(),
+});
+
+export const listBorrowerActiveProcessesSchema = Joi.object({
+  id: Joi.number().min(1).required(),
 });

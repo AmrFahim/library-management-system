@@ -48,7 +48,6 @@ const BooksSchema = {
 };
 
 const Books = sequelize.define(MODEL_NAME, BooksSchema, {
-  createdAt: "registerAt", // Rename createdAt to registerAt
   indexes: [
     {
       fields: ["title"],
