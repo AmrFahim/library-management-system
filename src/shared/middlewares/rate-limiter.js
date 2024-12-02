@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-
+import { configs } from "../utils/config.js";
 const rateLimit = (options) => {
-  const { windowMs, maxRequests } = options;
+  const { timeWindowLimit, maxRequests } = options;
 
   // In-memory storage for rate-limiting data where key is the ip
   const requests = {};
@@ -15,7 +15,7 @@ const rateLimit = (options) => {
     } else {
       const elapsedTime = currentTime - requests[key].reqTime;
 
-      if (elapsedTime < windowMs) {
+      if (elapsedTime < timeWindowLimit) {
         requests[key].count++;
       } else {
         requests[key] = { count: 1, reqTime: currentTime };
@@ -32,5 +32,7 @@ const rateLimit = (options) => {
     next();
   };
 };
-// 10 requests per minute
-export const rateLimiter = rateLimit({ windowMs: 60000, maxRequests: 10 });
+export const rateLimiter = rateLimit({
+  timeWindowLimit: configs.RATE_LIMITING_WINDOW,
+  maxRequests: configs.RATE_LIMITING_REQUESTS_COUNT,
+});

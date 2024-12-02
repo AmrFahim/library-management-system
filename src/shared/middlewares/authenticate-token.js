@@ -16,7 +16,7 @@ export const authenticateToken = async (req, res, next) => {
     // Verify the token
     const decoded = jwt.verify(token, configs.JWT_SECRET);
 
-    // Check if the decoded user ID matches the route parameter
+    // Check if the decoded Borrower ID matches the route parameter
     const borrowerId = parseInt(req.params.id);
 
     if (borrowerId && decoded.id !== borrowerId) {
