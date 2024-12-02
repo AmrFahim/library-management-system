@@ -15,9 +15,9 @@ const borrowingProcessSchema = {
     allowNull: false,
     references: {
       model: Borrower, // Reference to the Borrower model
-      key: "id", // The key in the User model to reference
+      key: "id", // The key in the Borrower model to reference
     },
-    onDelete: "CASCADE", // Optional: Cascade delete BorrowingProcess when User is deleted
+    onDelete: "CASCADE", // Optional: Cascade delete BorrowingProcess when Borrower is deleted
   },
   bookId: {
     type: DataTypes.INTEGER,

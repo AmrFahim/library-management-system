@@ -33,9 +33,6 @@ const BorrowerSchema = {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {
-      is: PASSWORD_REGEX,
-    },
   },
 };
 const Borrower = sequelize.define(MODEL_NAME, BorrowerSchema, {

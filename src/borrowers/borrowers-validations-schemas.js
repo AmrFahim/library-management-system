@@ -24,7 +24,6 @@ export const updateBorrowerParamsSchema = Joi.object({
 export const updateBorrowerBodySchema = Joi.object({
   name: Joi.string().min(3).max(30).pattern(NAME_REGEX),
   email: Joi.string().min(8).max(50).pattern(EMAIL_REGEX),
-  password: Joi.string().min(8).max(50).pattern(PASSWORD_REGEX),
 });
 
 export const deleteBorrowerSchema = Joi.object({

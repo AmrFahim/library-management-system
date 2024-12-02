@@ -237,13 +237,6 @@ export const borrowersSwaggerDocs = {
                     maxLength: 50,
                     pattern: "^[a-z0-9]+@[a-z]+\\.[a-z]{2,}$",
                   },
-                  password: {
-                    type: "string",
-                    minLength: 8,
-                    maxLength: 50,
-                    pattern:
-                      '^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*(),.?":{}|<>]{5,}$',
-                  },
                 },
               },
             },

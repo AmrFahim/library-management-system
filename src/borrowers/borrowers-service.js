@@ -10,7 +10,7 @@ class BorrowersService {
    * @param {string} borrowerData.name - Borrower's full name
    * @param {string} borrowerData.email - Borrower's email address
    * @param {string} borrowerData.password - Borrower's password
-   * @returns {Promise<Borrower>} Newly created borrower
+   * @returns {Promise<{token, Borrower}>} Newly created borrower
    * @throws {Error} If borrower already exists
    */
   static async register({ name, email, password }) {
