@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import Borrower from "./borrower-model.js";
 
@@ -15,6 +15,7 @@ class BorrowersService {
   static async register({ name, email, password }) {
     // Check for existing borrower
     const existingBorrower = await Borrower.findOne({ where: { email } });
+
     if (existingBorrower) {
       const error = new Error("Borrower already exists");
       error.status = httpStatus.CONFLICT;
@@ -22,7 +23,9 @@ class BorrowersService {
     }
 
     // Hash password and create borrower
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("qwertyuknb#$%^&*()(*&^%$#$%^&*(*&^%$#####");
     return Borrower.create({ name, email, password: hashedPassword });
   }
 
@@ -60,6 +63,16 @@ class BorrowersService {
 
     await borrower.destroy();
     return true;
+  }
+
+  static async findById(borrowerId) {
+    const borrower = await Borrower.findByPk(borrowerId);
+    if (!borrower) {
+      const error = new Error("Borrower not found");
+      error.status = httpStatus.NOT_FOUND;
+      throw error;
+    }
+    return borrower;
   }
 
   /**

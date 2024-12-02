@@ -2,39 +2,14 @@ import BorrowingProcess from "./borrowing-process-model.js";
 import httpStatus from "http-status";
 import Borrower from "../borrowers/borrower-model.js";
 import Book from "../books/book-model.js";
-import { sequelize } from "../shared/utils/db_ctx.js";
+
+import BorrowersService from "../borrowers/borrowers-service.js";
+import BooksService from "../books/books-service.js";
+import { sequelize } from "../shared/db/db_ctx.js";
 import { Op } from "sequelize";
 import dayjs from "dayjs";
 
 class BorrowingProcessService {
-  /**
-   * Validate borrower and book existence
-   * @param {number} borrowerId - The ID of the borrower
-   * @param {number} bookId - The ID of the book
-   * @returns {Promise<{book: Book, borrower: Borrower}>} Validated book
-   * @throws {Error} When borrower or book does not exist
-   */
-  static async validateBorrowerAndBook(borrowerId, bookId) {
-    const [borrower, book] = await Promise.all([
-      Borrower.findByPk(borrowerId),
-      Book.findByPk(bookId),
-    ]);
-
-    if (!borrower) {
-      const error = new Error("Borrower does not exist");
-      error.status = httpStatus.NOT_FOUND;
-      throw error;
-    }
-
-    if (!book) {
-      const error = new Error("Book does not exist");
-      error.status = httpStatus.NOT_FOUND;
-      throw error;
-    }
-
-    return { book, borrower };
-  }
-
   /**
    * Process a book borrowing for a borrower
    * @param {number} borrowerId - The ID of the borrower
@@ -44,11 +19,9 @@ class BorrowingProcessService {
    * @throws {Error} When borrowing is not possible due to various conditions
    */
   static async borrow(borrowerId, bookId, returnDate) {
-    // Validate borrower and book
-    const { book, borrower } = await this.validateBorrowerAndBook(
-      borrowerId,
-      bookId
-    );
+    // Validate borrower and book existence
+    await BorrowersService.findById(borrowerId);
+    const book = await BooksService.findById(bookId);
 
     // Check if book is already borrowed by this borrower
     const existingBorrowing = await BorrowingProcess.findOne({
@@ -106,8 +79,9 @@ class BorrowingProcessService {
    * @throws {Error} When book return is not possible due to various conditions
    */
   static async returnBook(borrowerId, bookId) {
-    // Validate borrower and book
-    await this.validateBorrowerAndBook(borrowerId, bookId);
+    // Validate borrower and book existence
+    await BorrowersService.findById(borrowerId);
+    const book = await BooksService.findById(bookId);
 
     // Find the specific borrowing process
     const borrowingProcess = await BorrowingProcess.findOne({
@@ -124,7 +98,7 @@ class BorrowingProcessService {
       throw error;
     }
 
-    const book = await Book.findByPk(bookId);
+    // const book = await Book.findByPk(bookId);
     const transaction = await sequelize.transaction();
 
     try {
@@ -181,8 +155,10 @@ class BorrowingProcessService {
       });
 
       return activeBorrowings.map((borrowing) => ({
-        returnDate: borrowing.returnDate,
+        bookId: borrowing.bookId,
         bookTitle: borrowing.book.title,
+        bookAuthor: borrowing.book.author,
+        returnDate: borrowing.returnDate,
       }));
     } catch (error) {
       const formattedError = new Error(

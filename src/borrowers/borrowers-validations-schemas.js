@@ -29,7 +29,9 @@ export const deleteBorrowerSchema = Joi.object({
 export const listBorrowersSchema = Joi.object({
   limit: Joi.number().integer().min(5).max(10).default(5),
   offset: Joi.number().integer().min(0).default(0),
-  sortBy: Joi.string().valid("title", "author", "isbn").default("title"),
+  sortBy: Joi.string()
+    .valid("registerAt", "email", "name")
+    .default("registerAt"),
   sortOrder: Joi.string().valid("ASC", "DESC").default("ASC"),
   searchTerm: Joi.string().allow(null, "").default(null),
 });

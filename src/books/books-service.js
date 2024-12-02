@@ -72,6 +72,7 @@ class BooksService {
    * @throws {Error} - Throws an error with status `422 UNPROCESSABLE_ENTITY` if the book creation fails.
    */
   static async addBook({ title, author, isbn, totalCount, shelfLocation }) {
+    console.log(title, author, isbn, totalCount, shelfLocation);
     try {
       const book = await Book.create({
         title,
@@ -83,7 +84,11 @@ class BooksService {
       });
       return book;
     } catch (err) {
-      const error = new Error("Error while adding the book " + err.message);
+      const error = new Error(
+        "Error while adding the book " +
+          err.message +
+          "you may enter an existing/invalid isbn"
+      );
       error.status = httpStatus.UNPROCESSABLE_ENTITY;
       throw error;
     }
@@ -128,6 +133,16 @@ class BooksService {
     }
     await book.destroy();
     return true;
+  }
+
+  static async findById(BookId) {
+    const book = await Book.findByPk(BookId);
+    if (!book) {
+      const error = new Error("Book not found");
+      error.status = httpStatus.NOT_FOUND;
+      throw error;
+    }
+    return book;
   }
 }
 

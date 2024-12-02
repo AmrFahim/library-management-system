@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../shared/utils/db_ctx.js";
+import { sequelize } from "../shared/db/db_ctx.js";
 import { ISBN_REGEX } from "../shared/constants/regex.js";
 
 const MODEL_NAME = "book";

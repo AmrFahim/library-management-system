@@ -1,6 +1,6 @@
-import { sequelize } from "./shared/utils/db_ctx.js";
+import { sequelize } from "./shared/db/db_ctx.js";
 import { configs } from "./shared/utils/config.js";
-import { enablePgTrgmExtension } from "./helpers/enable-pg-trgm.js";
+import { enablePgTrgmExtension } from "./shared/db/enable-pg-trgm.js";
 import app from "./server.js";
 
 (async () => {

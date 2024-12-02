@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../shared/utils/db_ctx.js";
+import { sequelize } from "../shared/db/db_ctx.js";
 import Book from "../books/book-model.js";
 import Borrower from "../borrowers/borrower-model.js";
 

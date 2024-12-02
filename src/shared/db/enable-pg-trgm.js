@@ -1,4 +1,4 @@
-import { sequelize } from "../shared/utils/db_ctx.js";
+import { sequelize } from "../db/db_ctx.js";
 
 export const enablePgTrgmExtension = async () => {
   try {
