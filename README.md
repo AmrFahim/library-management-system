@@ -14,6 +14,11 @@ A  NodeJS-based library management system
   - Track borrowing active borrows
   - Monitor book due dates
 
+- Borrowing Processes 
+  - a borrower can borrow and return books
+  - Track overdue books
+  - List processes from last month
+
 ## Search Performance
 The system implements advanced search using:
 - PostgreSQL `pg_trgm` extension
