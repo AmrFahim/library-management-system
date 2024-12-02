@@ -9,10 +9,18 @@ export const swaggerDefinition = {
     version: "1.0.0",
     description: "API documentation for Library Management System",
   },
+  servers: [
+    {
+      url: "/api",
+    },
+  ],
   paths: {
-    ...booksSwaggerDocs,
-    ...borrowersSwaggerDocs,
-    ...borrowingProcessesSwaggerDoc,
+    ...booksSwaggerDocs.paths,
+    ...borrowersSwaggerDocs.paths,
+    ...borrowingProcessesSwaggerDoc.paths,
+  },
+  components: {
+    ...(borrowersSwaggerDocs.components || {}),
   },
 };
 

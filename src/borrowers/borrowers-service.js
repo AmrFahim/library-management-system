@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import Borrower from "./borrower-model.js";
-
+import jwt from "jsonwebtoken";
+import { configs } from "../shared/utils/config.js";
 class BorrowersService {
   /**
    * Register a new borrower
@@ -25,8 +26,41 @@ class BorrowersService {
     // Hash password and create borrower
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    console.log("qwertyuknb#$%^&*()(*&^%$#$%^&*(*&^%$#####");
-    return Borrower.create({ name, email, password: hashedPassword });
+
+    const borrower = await Borrower.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+    const token = jwt.sign({ id: borrower.id }, configs.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    return { token, borrower };
+  }
+
+  static async login({ email, password }) {
+    // Find borrower by email
+    const borrower = await Borrower.findOne({ where: { email } });
+    if (!borrower) {
+      const error = new Error("Invalid email or password");
+      error.status = httpStatus.UNAUTHORIZED;
+      throw error;
+    }
+
+    // Compare the password
+    const isPasswordValid = await bcrypt.compare(password, borrower.password);
+    if (!isPasswordValid) {
+      const error = new Error("Invalid email or password");
+      error.status = httpStatus.UNAUTHORIZED;
+      throw error;
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: borrower.id }, configs.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    return { token, borrower };
   }
 
   /**
@@ -43,7 +77,7 @@ class BorrowersService {
       error.status = httpStatus.NOT_FOUND;
       throw error;
     }
-
+    // TODO: add logic to handle updating the password
     return borrower.update(updates);
   }
 

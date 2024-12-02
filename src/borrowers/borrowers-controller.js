@@ -20,11 +20,29 @@ class BorrowersController {
 
   static async register(req, res) {
     try {
-      const borrower = await BorrowersService.register(req.body);
+      const { token, borrower } = await BorrowersService.register(req.body);
       const { password, updatedAt, ...formattedBorrowerDate } =
         borrower.toJSON();
       res.status(httpStatus.CREATED).json({
         message: "Borrower registered successfully",
+        token,
+        borrower: formattedBorrowerDate,
+      });
+    } catch (error) {
+      res
+        .status(error.status || httpStatus.BAD_REQUEST)
+        .json({ error: error.message });
+    }
+  }
+
+  static async login(req, res) {
+    try {
+      const { token, borrower } = await BorrowersService.login(req.body);
+      const { password, updatedAt, ...formattedBorrowerDate } =
+        borrower.toJSON();
+      res.status(httpStatus.CREATED).json({
+        message: "Borrower logged-in successfully",
+        token,
         borrower: formattedBorrowerDate,
       });
     } catch (error) {

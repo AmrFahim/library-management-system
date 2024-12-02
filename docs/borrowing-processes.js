@@ -1,61 +1,55 @@
 export const borrowingProcessesSwaggerDoc = {
-  "/api/borrowing-processes/overdue": {
-    get: {
-      summary: "List Overdue Books",
-      description:
-        "Retrieves a list of all books that are currently overdue and not yet returned",
-      tags: ["Borrowing Processes"],
-      responses: {
-        200: {
-          description: "Successfully retrieved overdue books",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "success",
-                  },
-                  count: {
-                    type: "integer",
-                    description: "Number of overdue books",
-                  },
-                  data: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: {
-                          type: "integer",
-                          description: "Borrowing process ID",
-                        },
-                        borrowerId: {
-                          type: "integer",
-                          description: "ID of the borrower",
-                        },
-                        bookId: {
-                          type: "integer",
-                          description: "ID of the borrowed book",
-                        },
-                        returnDate: {
-                          type: "string",
-                          format: "date",
-                          description: "Original expected return date",
-                        },
-                        borrower: {
-                          type: "object",
-                          properties: {
-                            id: { type: "integer" },
-                            name: { type: "string" },
-                            email: { type: "string" },
+  openapi: "3.0.0",
+  info: {
+    title: "Library Management System - Borrowing Processes API",
+    version: "1.0.0",
+    description:
+      "API endpoints for managing borrowing processes in the library",
+  },
+  servers: [
+    {
+      url: "/api",
+    },
+  ],
+  paths: {
+    "/borrowing-processes/overdue": {
+      get: {
+        summary: "List Overdue Books",
+        description: "Retrieves a list of books that are currently overdue",
+        tags: ["Borrowing Processes"],
+        responses: {
+          200: {
+            description: "Successfully retrieved overdue books",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string", example: "success" },
+                    count: { type: "integer", example: 5 },
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "integer" },
+                          borrowerId: { type: "integer" },
+                          bookId: { type: "integer" },
+                          returnDate: { type: "string", format: "date" },
+                          borrower: {
+                            type: "object",
+                            properties: {
+                              id: { type: "integer" },
+                              name: { type: "string" },
+                              email: { type: "string" },
+                            },
                           },
-                        },
-                        book: {
-                          type: "object",
-                          properties: {
-                            id: { type: "integer" },
-                            title: { type: "string" },
+                          book: {
+                            type: "object",
+                            properties: {
+                              id: { type: "integer" },
+                              title: { type: "string" },
+                            },
                           },
                         },
                       },
@@ -65,17 +59,14 @@ export const borrowingProcessesSwaggerDoc = {
               },
             },
           },
-        },
-        500: {
-          description: "Internal server error",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  error: {
-                    type: "string",
-                    description: "Error message",
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
                   },
                 },
               },
@@ -84,80 +75,61 @@ export const borrowingProcessesSwaggerDoc = {
         },
       },
     },
-  },
-  "/api/borrowing-processes/last-month-borrows": {
-    get: {
-      summary: "List Borrowing Processes from Last Month",
-      description:
-        "Retrieves borrowing processes from the previous month, with optional filtering for overdue books",
-      tags: ["Borrowing Processes"],
-      parameters: [
-        {
-          name: "onlyOverdue",
-          in: "query",
-          required: false,
-          schema: {
-            type: "boolean",
-            default: false,
+    "/borrowing-processes/last-month-borrows": {
+      get: {
+        summary: "List Last Month's Borrowing Processes",
+        description:
+          "Retrieves borrowing processes from the previous month, with optional overdue filter",
+        tags: ["Borrowing Processes"],
+        parameters: [
+          {
+            name: "onlyOverdue",
+            in: "query",
+            description: "Filter to show only overdue borrowing processes",
+            required: false,
+            schema: {
+              type: "boolean",
+              default: false,
+            },
           },
-          description: "Filter to show only overdue borrowing processes",
-        },
-      ],
-      responses: {
-        200: {
-          description: "Successfully retrieved borrowing processes",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  message: {
-                    type: "string",
-                    example: "success",
-                  },
-                  count: {
-                    type: "integer",
-                    description: "Number of borrowing processes",
-                  },
-                  data: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: {
-                          type: "integer",
-                          description: "Borrowing process ID",
-                        },
-                        borrowerId: {
-                          type: "integer",
-                          description: "ID of the borrower",
-                        },
-                        bookId: {
-                          type: "integer",
-                          description: "ID of the borrowed book",
-                        },
-                        returnDate: {
-                          type: "string",
-                          format: "date",
-                          description: "Expected return date",
-                        },
-                        confirmedReturnDate: {
-                          type: "string",
-                          format: "date",
-                          description: "Actual return date (if returned)",
-                        },
-                        borrower: {
-                          type: "object",
-                          properties: {
-                            name: { type: "string" },
-                            email: { type: "string" },
+        ],
+        responses: {
+          200: {
+            description: "Successfully retrieved borrowing processes",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string", example: "success" },
+                    count: { type: "integer", example: 5 },
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "integer" },
+                          borrowerId: { type: "integer" },
+                          bookId: { type: "integer" },
+                          returnDate: { type: "string", format: "date" },
+                          confirmedReturnDate: {
+                            type: "string",
+                            format: "date",
+                            nullable: true,
                           },
-                        },
-                        book: {
-                          type: "object",
-                          properties: {
-                            title: { type: "string" },
-                            author: { type: "string" },
+                          borrower: {
+                            type: "object",
+                            properties: {
+                              name: { type: "string" },
+                              email: { type: "string" },
+                            },
+                          },
+                          book: {
+                            type: "object",
+                            properties: {
+                              title: { type: "string" },
+                              author: { type: "string" },
+                            },
                           },
                         },
                       },
@@ -167,17 +139,14 @@ export const borrowingProcessesSwaggerDoc = {
               },
             },
           },
-        },
-        500: {
-          description: "Internal server error",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  error: {
-                    type: "string",
-                    description: "Error message",
+          500: {
+            description: "Internal Server Error",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    error: { type: "string" },
                   },
                 },
               },

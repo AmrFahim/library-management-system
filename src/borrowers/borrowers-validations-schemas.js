@@ -12,6 +12,11 @@ export const registerBorrowerSchema = Joi.object({
   password: Joi.string().min(8).max(50).pattern(PASSWORD_REGEX).required(),
 });
 
+export const loginBorrowerSchema = Joi.object({
+  email: Joi.string().min(8).max(50).required(),
+  password: Joi.string().min(8).max(50).required(),
+});
+
 export const updateBorrowerParamsSchema = Joi.object({
   id: Joi.number().min(1).required(),
 });
